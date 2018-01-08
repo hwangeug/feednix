@@ -10,7 +10,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace FeedlyProvider {
 FeedlyProvider::FeedlyProvider() {
   curl_global_init(CURL_GLOBAL_DEFAULT);
   verboseFlag = false;
@@ -64,7 +63,7 @@ void FeedlyProvider::authenticateUser() {
   initialConfig.close();
 
   user_data.authToken = (root["developer_token"]).asString();
-  user_data.id = (root["userID"]).asString(); 
+  user_data.id = (root["userID"]).asString();
 
   Json::StyledWriter writer;
 
@@ -85,14 +84,14 @@ const std::map<std::string, std::string>* FeedlyProvider::getLabels() {
   std::ifstream data(TEMP_PATH.c_str(), std::ifstream::binary);
   parsingSuccesful = reader.parse(data, root);
 
-  if(data == NULL || curl_res != CURLE_OK || !parsingSuccesful){
+  if(curl_res != CURLE_OK || !parsingSuccesful){
     std::cerr << "ERROR: Failed to Retrive Categories" << std::endl;
     exit(EXIT_FAILURE);
     return NULL;
   }
-  user_data.categories["All"] = "user/" + user_data.id + "/category/global.all"; 
-  user_data.categories["Saved"] = "user/" + user_data.id + "/tag/global.saved"; 
-  user_data.categories["Uncategorized"] = "user/" + user_data.id + "/category/global.uncategorized"; 
+  user_data.categories["All"] = "user/" + user_data.id + "/category/global.all";
+  user_data.categories["Saved"] = "user/" + user_data.id + "/tag/global.saved";
+  user_data.categories["Uncategorized"] = "user/" + user_data.id + "/category/global.uncategorized";
 
   for(unsigned int i = 0; i < root.size(); i++)
     user_data.categories[(root[i]["label"]).asString()] = root[i]["id"].asString();
@@ -101,7 +100,7 @@ const std::map<std::string, std::string>* FeedlyProvider::getLabels() {
 }
 
 const std::vector<PostData>* FeedlyProvider::giveStreamPosts(const std::string& category) {
-  feeds.clear(); 
+  feeds.clear();
 
   if(category == "All")
     curl_retrive("streams/contents?ranked=newest&count=" + rtrv_count + "&unreadOnly=true&streamId=" + std::string(curl_easy_escape(curl, (user_data.categories["All"]).c_str(), 0)));
@@ -121,7 +120,7 @@ const std::vector<PostData>* FeedlyProvider::giveStreamPosts(const std::string& 
   parsingSuccesful = reader.parse(data, root);
 
 
-  if(data == NULL || curl_res != CURLE_OK || !parsingSuccesful){
+  if(curl_res != CURLE_OK || !parsingSuccesful){
     if(!parsingSuccesful)
       std::cerr << "\nERROR: Failed to parse tokens file" << reader.getFormatedErrorMessages() << std::endl;
     if(curl_res != CURLE_OK)
@@ -158,7 +157,7 @@ bool FeedlyProvider::markPostsRead(const std::vector<std::string>* ids) {
   jsonCont["action"] = "markAsRead";
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -202,7 +201,7 @@ bool FeedlyProvider::markPostsUnread(const std::vector<std::string>* ids) {
   jsonCont["action"] = "keepUnread";
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -246,7 +245,7 @@ bool FeedlyProvider::markPostsSaved(const std::vector<std::string>* ids) {
   jsonCont["action"] = "markAsSaved";
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -290,7 +289,7 @@ bool FeedlyProvider::markPostsUnsaved(const std::vector<std::string>* ids) {
   jsonCont["action"] = "markAsUnsaved";
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -334,7 +333,7 @@ bool FeedlyProvider::markCategoriesRead(const std::string& id, const std::string
   jsonCont["action"] = "markAsRead";
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -384,7 +383,7 @@ bool FeedlyProvider::addSubscription(bool newCategory, const std::string& feed, 
     jsonCont["categories"] = Json::Value(Json::arrayValue);
 
   Json::StyledWriter writer;
-  std::string document = writer.write(jsonCont); 
+  std::string document = writer.write(jsonCont);
 
   curl = curl_easy_init();
 
@@ -418,7 +417,7 @@ PostData* FeedlyProvider::getSinglePostData(const int index) {
 }
 
 const std::string FeedlyProvider::getUserId() {
-  return user_data.id; 
+  return user_data.id;
 }
 
 void FeedlyProvider::enableVerbose() {
